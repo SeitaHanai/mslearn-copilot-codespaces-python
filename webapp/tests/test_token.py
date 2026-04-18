@@ -101,3 +101,33 @@ def test_generate_page_out_of_range(client):
     response = client.post("/generate?page=99&page_size=10&total=10", json={})
     assert response.status_code == 400
     assert "total_pages" in response.json()["detail"]
+
+
+# --- Error response shape tests ---
+
+def test_error_response_shape_404(client):
+    """404 errors use the unified ErrorResponse envelope."""
+    import uuid
+    response = client.get(f"/users/{uuid.uuid4()}")
+    assert response.status_code == 404
+    body = response.json()
+    assert body["status_code"] == 404
+    assert "detail" in body
+
+
+def test_error_response_shape_400(client):
+    """400 from out-of-range page uses the unified ErrorResponse envelope."""
+    response = client.post("/generate?page=99&page_size=10&total=10", json={})
+    assert response.status_code == 400
+    body = response.json()
+    assert body["status_code"] == 400
+    assert "total_pages" in body["detail"]
+
+
+def test_error_response_shape_422(client):
+    """422 validation errors use the unified ErrorResponse envelope."""
+    response = client.post("/generate?page_size=0", json={})
+    assert response.status_code == 422
+    body = response.json()
+    assert body["status_code"] == 422
+    assert "detail" in body

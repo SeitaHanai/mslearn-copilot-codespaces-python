@@ -36,6 +36,18 @@ class PaginatedResponse(BaseModel):
     meta: PaginationMeta
 
 
+class ErrorResponse(BaseModel):
+    """Uniform error envelope returned by all exception handlers.
+
+    Attributes:
+        status_code: The HTTP status code of the error.
+        detail: Human-readable description of what went wrong.
+    """
+
+    status_code: int
+    detail: str
+
+
 class UserCreate(BaseModel):
     username: str
     email: str

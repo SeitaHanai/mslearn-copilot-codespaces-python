@@ -3,3 +3,4 @@ pydantic
 uvicorn[standard]
 pytest
 httpx==0.23.3
+slowapi==0.1.9
