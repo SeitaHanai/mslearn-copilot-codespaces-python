@@ -35,16 +35,28 @@ def generate(
     params: PaginationParams = Depends(),
     service: TokenService = Depends(get_token_service),
 ):
-    """
-    Generate a paginated list of pseudo-random token IDs.
+    """Generate a paginated list of pseudo-random token IDs.
 
-    Query parameters:
-    - **page**: page number (≥1)
-    - **page_size**: tokens per page (1–100, default 10)
-    - **total**: total tokens to conceptually generate (≥1, default 50)
+    Tokens are base64-encoded random byte sequences. The full conceptual
+    result set has ``total`` tokens; this endpoint returns the slice
+    corresponding to the requested ``page``.
 
-    Request body:
-    - **length**: character length of each token (default 20)
+    Args:
+        body: Request body containing the desired character ``length`` of
+            each token (default 20).
+        params: Query parameters controlling pagination — ``page`` (≥1),
+            ``page_size`` (1–100, default 10), and ``total`` (≥1,
+            default 50).
+        service: Injected ``TokenService`` instance used to generate tokens.
+
+    Returns:
+        A ``PaginatedResponse`` containing the tokens for the requested page
+        and metadata (``total``, ``page``, ``page_size``, ``total_pages``).
+
+    Raises:
+        HTTPException: 400 if ``page`` exceeds the computed ``total_pages``.
+        HTTPException: 422 if any query parameter fails Pydantic validation
+            (e.g. ``page < 1``, ``page_size > 100``).
     """
     total_pages = -(-params.total // params.page_size)  # ceiling division
     if params.page > total_pages:

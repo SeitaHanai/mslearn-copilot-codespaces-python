@@ -21,6 +21,17 @@ class PaginationMeta(BaseModel):
 
 
 class PaginatedResponse(BaseModel):
+    """Paginated list of generated tokens with accompanying metadata.
+
+    Attributes:
+        items: The tokens generated for the requested page. The number of
+            items equals ``page_size`` for all pages except the last, which
+            may contain fewer items when ``total`` is not evenly divisible
+            by ``page_size``.
+        meta: Pagination metadata describing the current page position and
+            the overall result set size.
+    """
+
     items: list[str]
     meta: PaginationMeta
 
